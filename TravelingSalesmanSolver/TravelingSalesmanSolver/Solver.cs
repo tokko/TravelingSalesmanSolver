@@ -158,11 +158,7 @@ namespace TravelingSalesmanSolver
 
         public static IEnumerable<double> SkipIndices(this double[] src, IReadOnlyCollection<int> indices)
         {
-            for (var i = 0; i < src.Length; i++)
-            {
-                if(indices.Contains(i)) continue;
-                yield return i;
-            }
-        } 
+            return src.Where((t, i) => !indices.Contains(i));
+        }
     }
 }
