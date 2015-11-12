@@ -35,13 +35,23 @@ namespace TravelingSalesmanSolver
             var coordinates = GraphGenerator.GetCoordinates();
             var distances = CalculateDistances(coordinates);
             var path = Greedy(coordinates, distances);
-            var r = new Random(4711);
         }
 
-        private static void TwoOpt(Node[] path, double[][] distances, Random r)
+        private static void RandomTwoOpt(Node[] path, double[][] distances)
         {
-            var a = path[r.Next(path.Length)];
-            var c = path[r.Next(path.Length)];
+            var r = new Random(4711);
+            for (var i = 0; i < 20*Math.Pow(10, 6); i++)
+            {
+                var a = path[r.Next(path.Length)];
+                var c = path[r.Next(path.Length)];
+                TwoOpt(a, c, distances);
+            }
+
+        }
+
+        private static void TwoOpt(Node a, Node c, double[][] distances)
+        {
+         
             var b = a.Next;
             var d = c.Next;
 
