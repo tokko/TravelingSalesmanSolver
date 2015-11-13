@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace TravelingSalesmanSolver
 {
+    [DebuggerDisplay("{Index}")]
     public class Node
     {
         public int Index { get; set; }
