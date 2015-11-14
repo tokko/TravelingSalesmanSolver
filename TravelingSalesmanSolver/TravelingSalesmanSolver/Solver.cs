@@ -72,14 +72,17 @@ namespace TravelingSalesmanSolver
 
             if (adbc > abcd) return;
 
-            a.Next = d;
-            d.Previous = a;
+            a.Next = c;
+            c.Previous = a;
+
+            b.Next = d;
+            d.Previous = b;
 
             c.Next = b;
             b.Previous = c;
 
             c.ToggleDirection();
-            d.ToggleDirection();
+            b.ToggleDirection();
         }
 
         public static Node[] Greedy(IReadOnlyCollection<Coordinate> coordinates, double[][] distances)

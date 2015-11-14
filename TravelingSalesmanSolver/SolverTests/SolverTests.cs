@@ -66,23 +66,38 @@ namespace SolverTests
                 node.Previous = nodes[i - 1];
             }
 
+            int a = 0, b = 1, d = 3, c = 2;
             var distances = new double[nodes.Length][];
-            distances[0] = new[]{0, 1, 0, 0.5};
-            distances[1] = new[]{1, 0, 0.5, 1};
-            distances[2] = new[]{0, 0.5, 0, 1};
-            distances[3] = new[]{0.5, 1, 1, 0};
+            distances[a] = new double [nodes.Length];
+            distances[b] = new double [nodes.Length];
+            distances[c] = new double [nodes.Length];
+            distances[d] = new double [nodes.Length];
 
-            Solver.TwoOpt(nodes[0], nodes[3], distances);
+            distances[a][b] = 1;
+            distances[b][d] = 1;
+            distances[d][c] = 1;
 
-            Assert.That(nodes[0].Next.Index, Is.EqualTo(2));   
-            Assert.That(nodes[1].Next.Index, Is.EqualTo(3));   
-            Assert.That(nodes[2].Next, Is.EqualTo(1));   
-            Assert.That(nodes[3].Next.Index, Is.Null);
+            distances[b][a] = 1;
+            distances[d][b] = 1;
+            distances[c][d] = 1;
+
+            distances[a][d] = 0.5;
+            distances[d][a] = 0.5;
+            distances[b][c] = 0.5;
+            distances[c][b] = 0.5;
+
+
+            Solver.TwoOpt(nodes[0], nodes[2], distances);
+
+            Assert.That(nodes[a].Next.Index, Is.EqualTo(c));   
+            Assert.That(nodes[b].Next.Index, Is.EqualTo(d));   
+            Assert.That(nodes[c].Next.Index, Is.EqualTo(b));   
+            Assert.That(nodes[d].Next, Is.Null);
                
-            Assert.That(nodes[0].Previous, Is.Null);   
-            Assert.That(nodes[1].Previous.Index, Is.EqualTo(3));   
-            Assert.That(nodes[2].Previous.Index, Is.EqualTo(1));   
-            Assert.That(nodes[3].Previous.Index, Is.EqualTo(0));   
+            Assert.That(nodes[a].Previous, Is.Null);   
+            Assert.That(nodes[b].Previous.Index, Is.EqualTo(c));   
+            Assert.That(nodes[c].Previous.Index, Is.EqualTo(a));   
+            Assert.That(nodes[d].Previous.Index, Is.EqualTo(b));   
         }
 
         [Test]
