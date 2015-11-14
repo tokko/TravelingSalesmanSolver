@@ -24,13 +24,13 @@ namespace SolverTests
         public void TestSkipIndices()
         {
             var list = new List<double> {3, 6, 1, 5, 3, 9, 19}.ToArray();
-            var skipList = new List<int> {1, 3};
+            var skipList = new HashSet<int>{1, 3};
 
             var res = list.SkipIndices(skipList).ToList();
 
             Assert.That(res.Count(), Is.EqualTo(list.Count() - skipList.Count));
-            Assert.That(res.Contains(list[skipList[0]]), Is.False);
-            Assert.That(res.Contains(list[skipList[1]]), Is.False);
+            Assert.That(res.Contains(list[1]), Is.False);
+            Assert.That(res.Contains(list[3]), Is.False);
         }
 
         [Test]
@@ -119,6 +119,23 @@ namespace SolverTests
             var expectedPath = new List<int> {0, 2, 1, 3};
             Assert.That(res.Count, Is.EqualTo(expectedPath.Count));
             Assert.That(res.Zip(expectedPath, (a, b) => a == b).ToList().All(x => x), Is.True);
+        }
+
+        [Test]
+        public void TestGreedy_NoNullElements()
+        {
+            var coordinates = GraphGenerator.GetCoordinates();
+            var distances = Solver.CalculateDistances(coordinates);
+            var path = Solver.Greedy(coordinates, distances);
+            Assert.That(path.Any(x => x == null), Is.EqualTo(false));
+        }
+
+        [Test]
+        [Ignore]
+        public void TestSolveLargeTsp()
+        {
+            var l = Solver.Solve();
+            Assert.NotNull(l);
         }
     }
 }

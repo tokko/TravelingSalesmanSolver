@@ -32,13 +32,13 @@ namespace TravelingSalesmanSolver
     public class Solver
     {
 
-        public void Solve()
+        public static List<int> Solve()
         {
             var coordinates = GraphGenerator.GetCoordinates();
             var distances = CalculateDistances(coordinates);
             var path = Greedy(coordinates, distances);
             RandomTwoOpt(path, distances);
-            path.GetPath();
+            return path.GetPath().ToList();
         }
 
         public static void RandomTwoOpt(Node[] path, double[][] distances)
@@ -56,8 +56,8 @@ namespace TravelingSalesmanSolver
         public static void TwoOpt(Node a, Node c, double[][] distances)
         {
             //if either of seeds is end of path
-            if (a.Next == null) a = a.Previous;
-            if (c.Next == null) c = c.Previous;
+            if (a == null || c == null) return;
+            if (a.Next == null || c.Next == null) return;
 
             var b = a.Next;
             var d = c.Next;
@@ -90,18 +90,19 @@ namespace TravelingSalesmanSolver
         {
             var r = new Random(5);
             var current = r.Next(coordinates.Count);
-            var visited = new List<int>();
-            var path = new Node[coordinates.Count];
-            path[current] = new Node(current);
-            for (var i = 1; i < coordinates.Count; i++)
+            var visited = new HashSet<int>();
+            var path = new List<Node> {new Node(current)};
+            while(path.Count < coordinates.Count)
             {
+                var i = current;
                 var closest = distances[i].SkipIndices(visited).ToList().IndexOfMin();
-                path[closest] = new Node(i, path[current]);
-                path[current].Next = path[closest];
+                var closestNode = new Node(i, path.Last());
+                path.Last().Next = closestNode;
+                path.Add(closestNode);
                 current = closest;
                 visited.Add(i);
             }
-            return path;
+            return path.ToArray();
         }
 
         public static double[][] CalculateDistances(IReadOnlyList<Coordinate> coordinates)
@@ -112,6 +113,7 @@ namespace TravelingSalesmanSolver
                 distances[i] = new double[coordinates.Count];
                 for (var j = i; j < coordinates.Count; j++)
                 {
+                    distances[j] = new double[coordinates.Count];
                     var d = FastAbs(coordinates[i].X - coordinates[j].X) + FastAbs(coordinates[i].Y - coordinates[j].Y);
                     distances[i][j] = d;
                     distances[j][i] = d;
@@ -168,7 +170,7 @@ namespace TravelingSalesmanSolver
             return minIndex;
         }
 
-        public static IEnumerable<double> SkipIndices(this double[] src, IReadOnlyCollection<int> indices)
+        public static IEnumerable<double> SkipIndices(this double[] src, HashSet<int> indices)
         {
             return src.Where((t, i) => !indices.Contains(i));
         }

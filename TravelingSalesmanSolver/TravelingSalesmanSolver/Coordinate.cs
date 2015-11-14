@@ -22,7 +22,7 @@ namespace TravelingSalesmanSolver
         public static List<Coordinate> GetCoordinates()
         {
             var r = new Random(1337);
-            return Enumerable.Range(0, 2000).Select(x => new Coordinate(r.NextDouble()*100, r.NextDouble()*100)).ToList();
+            return Enumerable.Range(0, 20).Select(x => new Coordinate(r.NextDouble()*100, r.NextDouble()*100)).ToList();
         } 
     }
 }
