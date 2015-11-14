@@ -136,13 +136,13 @@ namespace TravelingSalesmanSolver
             Func<Node, Node> backward = (node) => node.Previous;
             var directions = new[] {forward, backward};
             var currentDirection = 0;
-            Node next;
-            while ((next = directions[currentDirection](current)) != null)
+            while (current != null)
             {
                 yield return current.Index;
-
-                if(current.Backwards != directions[currentDirection](current).Backwards)
-                    currentDirection = ++currentDirection % 2;
+                var next = directions[currentDirection](current);
+                if (next == null) break;
+                if (current.Backwards != next.Backwards)
+                    ; //currentDirection = ++currentDirection % 2;
 
                 current = next;
             }

@@ -33,59 +33,11 @@ namespace SolverTests
         }
 
         [Test]
-        public void TestGetPath()
-        {
-            var nodes = new Node[10];
-            for (var i = 0; i < nodes.Length; i++)
-            {
-                var node = new Node(i);
-                nodes[i] = node;
-                if (i <= 0) continue;
-                nodes[i - 1].Next = node;
-                node.Previous = nodes[i - 1];
-            }
-
-            var res = nodes.GetPath().ToList();
-            Assert.That(res[0], Is.EqualTo(0));
-            for (var i = 1; i < res.Count; i++)
-            {
-                Assert.That(res[i], Is.EqualTo(i));
-            }
-        }
-
-        [Test]
         public void Test2Opt()
         {
-            var nodes = new Node[4];
-            for (var i = 0; i < nodes.Length; i++)
-            {
-                var node = new Node(i);
-                nodes[i] = node;
-                if (i <= 0) continue;
-                nodes[i - 1].Next = node;
-                node.Previous = nodes[i - 1];
-            }
-
-            int a = 0, b = 1, d = 3, c = 2;
-            var distances = new double[nodes.Length][];
-            distances[a] = new double [nodes.Length];
-            distances[b] = new double [nodes.Length];
-            distances[c] = new double [nodes.Length];
-            distances[d] = new double [nodes.Length];
-
-            distances[a][b] = 1;
-            distances[b][d] = 1;
-            distances[d][c] = 1;
-
-            distances[b][a] = 1;
-            distances[d][b] = 1;
-            distances[c][d] = 1;
-
-            distances[a][d] = 0.5;
-            distances[d][a] = 0.5;
-            distances[b][c] = 0.5;
-            distances[c][b] = 0.5;
-
+            const int a = 0, b = 1, d = 3, c = 2;
+            double[][] distances;
+            var nodes = CreteNodesAndDistancesForSIngle2Opt(out distances);
 
             Solver.TwoOpt(nodes[0], nodes[2], distances);
 
@@ -100,9 +52,42 @@ namespace SolverTests
             Assert.That(nodes[d].Previous.Index, Is.EqualTo(b));   
         }
 
+        private static Node[] CreteNodesAndDistancesForSIngle2Opt(out double[][] distances)
+        {
+            var nodes = new Node[4];
+            for (var i = 0; i < nodes.Length; i++)
+            {
+                var node = new Node(i);
+                nodes[i] = node;
+                if (i <= 0) continue;
+                nodes[i - 1].Next = node;
+                node.Previous = nodes[i - 1];
+            }
+
+            const int a = 0, b = 1, d = 3, c = 2;
+            distances = new double[nodes.Length][];
+            distances[a] = new double[nodes.Length];
+            distances[b] = new double[nodes.Length];
+            distances[c] = new double[nodes.Length];
+            distances[d] = new double[nodes.Length];
+
+            distances[a][b] = 1;
+            distances[b][d] = 1;
+            distances[d][c] = 1;
+
+            distances[b][a] = 1;
+            distances[d][b] = 1;
+            distances[c][d] = 1;
+
+            distances[a][d] = 0.5;
+            distances[d][a] = 0.5;
+            distances[b][c] = 0.5;
+            distances[c][b] = 0.5;
+            return nodes;
+        }
+
         [Test]
-        [Ignore]
-        public void TestGetPathOpted()
+        public void TestGetPath()
         {
             var nodes = new Node[10];
             for (var i = 0; i < nodes.Length; i++)
@@ -114,24 +99,27 @@ namespace SolverTests
                 node.Previous = nodes[i - 1];
             }
 
-            var distances = new double[nodes.Length][];
-            distances[2] = new double[nodes.Length];
-            distances[5] = new double[nodes.Length];
-            distances[3] = new double[nodes.Length];
-            distances[6] = new double[nodes.Length];
-            distances[2][3] = 1;
-            distances[3][2] = 1;
-            distances[5][6] = 1;
-            distances[6][5] = 1;
-
-            Solver.TwoOpt(nodes[2], nodes[5], distances);
-
-            var res = nodes.GetPath().ToList();
+            var path = nodes.GetPath();
+            var res = path.ToList();
             Assert.That(res[0], Is.EqualTo(0));
             for (var i = 1; i < res.Count; i++)
             {
                 Assert.That(res[i], Is.EqualTo(i));
             }
+        }
+
+        [Test]
+        public void TestGetPathOpted()
+        {
+            double[][] distances;
+            var nodes = CreteNodesAndDistancesForSIngle2Opt(out distances);
+
+            Solver.TwoOpt(nodes[0], nodes[2], distances);
+
+            var path = nodes.GetPath();
+            var res = path.ToList();
+            var expectedPath = new List<int> {0, 2, 1, 3};
+            Assert.That(res.Zip(expectedPath, (a, b) => a == b).All(x => x), Is.True);
         }
     }
 }
