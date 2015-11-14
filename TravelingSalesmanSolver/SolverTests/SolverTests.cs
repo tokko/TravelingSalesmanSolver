@@ -132,6 +132,36 @@ namespace SolverTests
 
         [Test]
         [Ignore]
+        public void TestGreedy_ForwardIntegrity()
+        {
+            var coordinates = GraphGenerator.GetCoordinates();
+            var distances = Solver.CalculateDistances(coordinates);
+            var path = Solver.Greedy(coordinates, distances);
+            var visited = new HashSet<int>();
+            for (var current = path.Single(n => n.Previous == null); current != null; current = current.Next) 
+            {
+                Assert.That(visited.Add(current.Index), Is.True);
+            }
+            path.Select(n => n.Index).ToList().ForEach(i => Assert.That(visited.Contains(i)));
+        }
+
+        [Test]
+        public void TestRandom_ForwardIntegrity()
+        {
+            var coordinates = GraphGenerator.GetCoordinates();
+            var path = Solver.RandomApprox(coordinates.Count);
+            Assert.That(path.Length, Is.EqualTo(coordinates.Count));
+            var visited = new HashSet<int>();
+            path.Last().Next = null;
+            for (var current = path.First(); current != null; current = current.Next) 
+            {
+                Assert.That(visited.Add(current.Index), Is.True);
+            }
+            Assert.That(visited.Count, Is.EqualTo(coordinates.Count));
+            path.Select(n => n.Index).ToList().ForEach(i => Assert.That(visited.Contains(i)));
+        }
+
+        [Test]
         public void TestSolveLargeTsp()
         {
             var l = Solver.Solve();

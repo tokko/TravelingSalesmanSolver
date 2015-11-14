@@ -36,7 +36,7 @@ namespace TravelingSalesmanSolver
         {
             var coordinates = GraphGenerator.GetCoordinates();
             var distances = CalculateDistances(coordinates);
-            var path = Greedy(coordinates, distances);
+            var path = RandomApprox(coordinates.Count);
             RandomTwoOpt(path, distances);
             return path.GetPath().ToList();
         }
@@ -84,6 +84,25 @@ namespace TravelingSalesmanSolver
             d.Previous = b;
 
            
+        }
+
+        public static Node[] RandomApprox(int n)
+        {
+            var nodes = new Node[n];
+            var visited = new HashSet<int>();
+            var r = new Random(4711);
+            for (var i = 0; i < n; i++)
+            {
+                int index;
+                while (!visited.Add(index = r.Next(n)));
+                nodes[i] = new Node(index);
+                if (i <= 0) continue;
+                nodes[i].Previous = nodes[i - 1];
+                nodes[i - 1].Next = nodes[i];
+            }
+            nodes[0].Previous = nodes.Last();
+            nodes.Last().Next = nodes[0];
+            return nodes;
         }
 
         public static Node[] Greedy(IReadOnlyCollection<Coordinate> coordinates, double[][] distances)
@@ -134,26 +153,16 @@ namespace TravelingSalesmanSolver
 
         public static IEnumerable<int> GetPath(this Node[] src)
         {
-            var current = src.Single(n => n.Previous == null);
-            Func<Node, Node> forward = (node) => node.Next;
-            Func<Node, Node> backward = (node) => node.Previous;
-            var directions = new[] {forward, backward};
-            var currentDirection = 0;
+            var current = src.First();
             var backwards = current.Toggle;
+            src.Last().Next = null;
+            src.First().Previous = null;
             while (current != null)
             {
                 yield return current.Index;
                 current = backwards ? current.Previous : current.Next;
                 if (current != null && current.Toggle)
                     backwards = !backwards;
-                /*
-                var previous = directions[++currentDirection % 2](current);
-                if (previous != null && previous.Toggle != current.Toggle)
-                {
-                    currentDirection = ++currentDirection % 2;
-                }
-                current = directions[currentDirection](current);
-                */
             }
         } 
 
