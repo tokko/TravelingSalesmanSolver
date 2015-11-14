@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Remoting.Channels;
 using NUnit.Framework;
 using NUnit.Framework.Constraints;
 using TravelingSalesmanSolver;
@@ -42,12 +43,9 @@ namespace SolverTests
             Solver.TwoOpt(nodes[0], nodes[2], distances);
 
             Assert.That(nodes[a].Next.Index, Is.EqualTo(c));   
-            Assert.That(nodes[b].Next.Index, Is.EqualTo(d));   
-            Assert.That(nodes[c].Next.Index, Is.EqualTo(b));   
             Assert.That(nodes[d].Next, Is.Null);
                
             Assert.That(nodes[a].Previous, Is.Null);   
-            Assert.That(nodes[b].Previous.Index, Is.EqualTo(c));   
             Assert.That(nodes[c].Previous.Index, Is.EqualTo(a));   
             Assert.That(nodes[d].Previous.Index, Is.EqualTo(b));   
         }
@@ -119,7 +117,8 @@ namespace SolverTests
             var path = nodes.GetPath();
             var res = path.ToList();
             var expectedPath = new List<int> {0, 2, 1, 3};
-            Assert.That(res.Zip(expectedPath, (a, b) => a == b).All(x => x), Is.True);
+            Assert.That(res.Count, Is.EqualTo(expectedPath.Count));
+            Assert.That(res.Zip(expectedPath, (a, b) => a == b).ToList().All(x => x), Is.True);
         }
     }
 }

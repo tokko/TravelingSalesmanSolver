@@ -11,7 +11,7 @@ namespace TravelingSalesmanSolver
         public int Index { get; set; }
         public Node Next { get; set; }
         public Node Previous { get; set; }
-        public bool Backwards { get; set; }
+        public bool Toggle { get; set; }
 
         public Node(int index)
         {
@@ -25,7 +25,7 @@ namespace TravelingSalesmanSolver
 
         public void ToggleDirection()
         {
-            Backwards = !Backwards;
+            Toggle = !Toggle;
         }
     }
 
@@ -72,17 +72,18 @@ namespace TravelingSalesmanSolver
 
             if (adbc > abcd) return;
 
-            a.Next = c;
-            c.Previous = a;
+            c.ToggleDirection();
+            b.Next?.ToggleDirection();
 
+            a.Next = c;
+            c.Next = c.Previous;
+            c.Previous = a;
+            
+            b.Previous = b.Next;
             b.Next = d;
             d.Previous = b;
 
-            c.Next = b;
-            b.Previous = c;
-
-            c.ToggleDirection();
-            b.ToggleDirection();
+           
         }
 
         public static Node[] Greedy(IReadOnlyCollection<Coordinate> coordinates, double[][] distances)
@@ -136,15 +137,21 @@ namespace TravelingSalesmanSolver
             Func<Node, Node> backward = (node) => node.Previous;
             var directions = new[] {forward, backward};
             var currentDirection = 0;
+            var backwards = current.Toggle;
             while (current != null)
             {
                 yield return current.Index;
-                var next = directions[currentDirection](current);
-                if (next == null) break;
-                if (current.Backwards != next.Backwards)
-                    ; //currentDirection = ++currentDirection % 2;
-
-                current = next;
+                current = backwards ? current.Previous : current.Next;
+                if (current != null && current.Toggle)
+                    backwards = !backwards;
+                /*
+                var previous = directions[++currentDirection % 2](current);
+                if (previous != null && previous.Toggle != current.Toggle)
+                {
+                    currentDirection = ++currentDirection % 2;
+                }
+                current = directions[currentDirection](current);
+                */
             }
         } 
 
